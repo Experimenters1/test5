@@ -26,7 +26,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="edO-7l-kKi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-587" y="-609"/>
+            <point key="canvasLocation" x="-373" y="-665"/>
         </scene>
         <!--Files-->
         <scene sceneID="I9m-TX-vAf">
@@ -39,23 +39,34 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hRT-FC-T51">
                                 <rect key="frame" x="0.0" y="103" width="393" height="666"/>
                                 <subviews>
+                                    <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="kCV-Fh-rG9">
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="barTintColor" red="0.12941176470588234" green="0.12549019607843137" blue="0.11764705882352941" alpha="1" colorSpace="calibratedRGB"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </searchBar>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="E3k-mK-CRl">
-                                        <rect key="frame" x="0.0" y="30" width="393" height="636"/>
+                                        <rect key="frame" x="0.0" y="57" width="393" height="609"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <color key="separatorColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemGreenColor"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="E3k-mK-CRl" secondAttribute="bottom" id="8R4-Qc-fYN"/>
-                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="top" secondItem="hRT-FC-T51" secondAttribute="top" constant="40" id="I5L-OC-uUu"/>
-                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="top" secondItem="hRT-FC-T51" secondAttribute="top" constant="30" id="JRl-dp-ypx"/>
-                                    <constraint firstAttribute="trailing" secondItem="E3k-mK-CRl" secondAttribute="trailing" id="VSI-H6-F13"/>
-                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="leading" secondItem="hRT-FC-T51" secondAttribute="leading" id="iV2-cH-0h1"/>
+                                    <constraint firstAttribute="trailing" secondItem="E3k-mK-CRl" secondAttribute="trailing" id="6Iu-lI-rTF"/>
+                                    <constraint firstAttribute="trailing" secondItem="kCV-Fh-rG9" secondAttribute="trailing" id="BBv-4w-rxV"/>
+                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="top" secondItem="kCV-Fh-rG9" secondAttribute="bottom" constant="1" id="Fm5-g0-1aW"/>
+                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="leading" secondItem="hRT-FC-T51" secondAttribute="leading" id="Oxf-vo-EXX"/>
+                                    <constraint firstAttribute="bottom" secondItem="E3k-mK-CRl" secondAttribute="bottom" id="ZSg-im-ow5"/>
+                                    <constraint firstItem="E3k-mK-CRl" firstAttribute="top" secondItem="kCV-Fh-rG9" secondAttribute="bottom" constant="1" id="dhh-GK-7wr"/>
+                                    <constraint firstItem="kCV-Fh-rG9" firstAttribute="top" secondItem="hRT-FC-T51" secondAttribute="top" id="pwd-jr-eP2"/>
+                                    <constraint firstItem="kCV-Fh-rG9" firstAttribute="leading" secondItem="hRT-FC-T51" secondAttribute="leading" id="qex-re-HAI"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Z77-sh-7Wl"/>
-                        <color key="backgroundColor" red="0.0" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.10196078431372549" green="0.094117647058823528" blue="0.090196078431372548" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="hRT-FC-T51" firstAttribute="leading" secondItem="Z77-sh-7Wl" secondAttribute="leading" id="5Iq-Tt-19v"/>
                             <constraint firstItem="Z77-sh-7Wl" firstAttribute="bottom" secondItem="hRT-FC-T51" secondAttribute="bottom" id="CcN-fp-S2R"/>
@@ -65,7 +76,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="Files" id="Cdl-fs-OXI"/>
                     <connections>
-                        <outlet property="tableView" destination="E3k-mK-CRl" id="ftn-aB-AGO"/>
+                        <outlet property="searchBar" destination="kCV-Fh-rG9" id="rpq-IQ-QId"/>
+                        <outlet property="tableView" destination="E3k-mK-CRl" id="cJz-pL-Etl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eB1-sJ-zuv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -149,9 +161,12 @@
                                 <constraints>
                                     <constraint firstItem="zv5-5D-Cfo" firstAttribute="top" secondItem="yJS-0l-1S9" secondAttribute="top" constant="139" id="3Oj-1r-FeU"/>
                                     <constraint firstItem="zv5-5D-Cfo" firstAttribute="leading" secondItem="yJS-0l-1S9" secondAttribute="leading" constant="29" id="EGf-DP-Kta"/>
+                                    <constraint firstAttribute="trailing" secondItem="X7a-Bn-bsq" secondAttribute="trailing" constant="29" id="Kel-El-fcO"/>
                                     <constraint firstAttribute="bottom" secondItem="zv5-5D-Cfo" secondAttribute="bottom" constant="353" id="LJe-Wi-A8s"/>
+                                    <constraint firstItem="X7a-Bn-bsq" firstAttribute="leading" secondItem="yJS-0l-1S9" secondAttribute="leading" constant="29" id="Q6U-yc-JYE"/>
                                     <constraint firstAttribute="trailing" secondItem="zv5-5D-Cfo" secondAttribute="trailing" constant="30" id="R9m-Lc-emw"/>
                                     <constraint firstItem="zv5-5D-Cfo" firstAttribute="centerX" secondItem="yJS-0l-1S9" secondAttribute="centerX" id="Rt7-RR-9ny"/>
+                                    <constraint firstAttribute="trailing" secondItem="zv5-5D-Cfo" secondAttribute="trailing" constant="29" id="TNr-nU-d8T"/>
                                     <constraint firstItem="X7a-Bn-bsq" firstAttribute="top" secondItem="zv5-5D-Cfo" secondAttribute="bottom" constant="30" id="V7h-Ri-LcA"/>
                                     <constraint firstItem="X7a-Bn-bsq" firstAttribute="leading" secondItem="zv5-5D-Cfo" secondAttribute="trailing" constant="-334" id="VnU-FU-AiD"/>
                                     <constraint firstAttribute="trailing" secondItem="X7a-Bn-bsq" secondAttribute="trailing" constant="30" id="jaY-Ip-RbU"/>
@@ -287,9 +302,6 @@
         </systemColor>
         <systemColor name="systemBrownColor">
             <color red="0.63529411764705879" green="0.51764705882352946" blue="0.36862745098039218" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemGreenColor">
-            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemMintColor">
             <color red="0.0" green="0.7803921568627451" blue="0.74509803921568629" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -15,9 +15,16 @@ import MobileCoreServices
 class Files: UIViewController {
      
 
+    @IBOutlet weak var searchBar: UISearchBar!
     
     @IBOutlet weak var tableView: UITableView!
-    var links: [(name: String, date: String, type: String, url: URL)] = []
+    
+    var filteredArr = [String]()
+    var searching: Bool = false
+    
+//    var links: [(name: String, date: String, type: String, url: URL)] = []
+    var links: [(name: String, time: String, type: String, url: URL)] = []
+
     let userDefaults = UserDefaults.standard
     
     override func viewDidLoad() {
@@ -25,13 +32,21 @@ class Files: UIViewController {
 
         
         // Register the table view cell class
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "tableView")
+
+        
+        tableView.register(UINib(nibName: "TableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
+        
                     
         // Do any additional setup after loading the view.
         loadLinks()
                   
         tableView.delegate = self
         tableView.dataSource = self
+        searchBar.delegate = self
+        tableView.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+                UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = .white
+        
         tableView.reloadData()
     }
 
@@ -62,11 +77,14 @@ func loadLinks() {
         let attributes = try? fileManager.attributesOfItem(atPath: fileURL.path)
         let creationDate = attributes?[.creationDate] as? Date ?? Date()
         let type = fileURL.pathExtension.lowercased()
-        links.append((name: fileName, date: DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium), type: type, url: fileURL))
+//        links.append((name: fileName, date: DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium), type: type, url: fileURL))
+        let time = DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium)
+        links.append((name: fileName, time: time, type: type, url: fileURL))
+
     }
 }
 
-           
+            
            
            
 func copyFileToDocumentsFolder(sourceURL: URL, destinationURL: URL, fileName: String) throws ->String {
@@ -106,28 +124,52 @@ func copyFileToDocumentsFolder(sourceURL: URL, destinationURL: URL, fileName: St
 extension Files: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return links.count
+        if searching {
+                   return filteredArr.count
+               } else {
+                   return links.count
+               }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
+        return 93
     }
-     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "tableView", for: indexPath) as? UITableViewCell else {
+
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? TableViewCell else {
             return UITableViewCell()
-            
         }
         
-        cell.textLabel?.text = "Henvfbhvfbfhbvfvfbhv"
-        cell.textLabel?.text = links[indexPath.row].name
-        cell.detailTextLabel?.text = links[indexPath.row].date
-        cell.detailTextLabel?.text = links[indexPath.row].url.path
+
+        if searching {
+            cell.setVideoName(name: filteredArr[indexPath.row])
+
+        } else {
+            cell.setVideoName(name: links[indexPath.row].name)
+            
+            
+            let videoURL = links[indexPath.row].url
+                cell.setVideoImage(fromURL: videoURL)
+            
+            let videoDuration = getVideoDuration(url: videoURL)
+                    cell.setVideoTime(timeInterval: videoDuration)
+        }
+
+        cell.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         return cell
     }
     
-}
+    func getVideoDuration(url: URL) -> TimeInterval {
+        let asset = AVAsset(url: url)
+        let duration = asset.duration
+        let durationSeconds = CMTimeGetSeconds(duration)
+        return durationSeconds
+    }
+
+
+            
+    }
 
 
 // MARK: - UITableViewDelegate
@@ -143,3 +185,32 @@ extension Files: UITableViewDelegate {
         }
     }
 }
+
+
+
+
+extension Files: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            filteredArr = links.filter({$0.name.lowercased().prefix(searchText.count) == searchText.lowercased()})
+                .map({$0.name})
+           print(filteredArr)
+
+            searching = true
+            tableView.reloadData()
+        }
+
+     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+         searching = false
+         searchBar.text = ""
+         tableView.reloadData()
+     }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+}
+
+
+

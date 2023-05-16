@@ -20,6 +20,7 @@ class Import: UIViewController {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        
     }
     
     
@@ -56,7 +57,9 @@ extension Import: UIDocumentPickerDelegate {
 
         do {
             let newName = try filesVC.copyFileToDocumentsFolder(sourceURL: sourceURL, destinationURL: destinationURL, fileName: fileName)
-            filesVC.links.append((name: newName, date: "", type: sourceURL.pathExtension, url: destinationURL.appendingPathComponent(newName)))
+            let videoDuration = getVideoDuration(url: destinationURL.appendingPathComponent(newName)) ?? ""
+            filesVC.links.append((name: newName, time: videoDuration, type: sourceURL.pathExtension, url: destinationURL.appendingPathComponent(newName)))
+
             filesVC.saveLinks()
 
             if let tableView = filesVC.tableView {
@@ -71,8 +74,19 @@ extension Import: UIDocumentPickerDelegate {
             print("Error copying file: \(error.localizedDescription)")
         }
     }
+    
+    func getVideoDuration(url: URL) -> String? {
+        let asset = AVAsset(url: url)
+        let duration = asset.duration
+        let durationSeconds = CMTimeGetSeconds(duration)
+        
+        let minutes = Int(durationSeconds / 60)
+        let seconds = Int(durationSeconds) % 60
+        
+        let formattedDuration = String(format: "%02d:%02d", minutes, seconds)
+        return formattedDuration
+    }
 }
-
 
 
 extension Import: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -95,20 +109,33 @@ extension Import: UIImagePickerControllerDelegate, UINavigationControllerDelegat
         let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let destinationURL = documentsFolderURL.appendingPathComponent(url.lastPathComponent)
         
+        let asset = AVAsset(url: url)
+        let duration = asset.duration
+        let durationSeconds = CMTimeGetSeconds(duration)
+        let minutes = Int(durationSeconds / 60)
+        let seconds = Int(durationSeconds) % 60
+        let videoDuration = String(format: "%02d:%02d", minutes, seconds)
+
+        
         do {
             let fileName = try filesVC.copyFileToDocumentsFolder(sourceURL: url, destinationURL: documentsFolderURL, fileName: url.lastPathComponent)
             let type = url.pathExtension.lowercased()
-            filesVC.links.append((name: fileName, date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .medium), type: type, url: destinationURL))
+            filesVC.links.append((name: fileName, time: videoDuration, type: type, url: destinationURL))
+
             filesVC.tableView.reloadData()
             filesVC.saveLinks()
         } catch {
             print(error.localizedDescription)
         }
+        
+        
     }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
+    
+    
 }
 
 
