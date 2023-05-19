@@ -35,7 +35,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YGi-hy-sGj">
-                        <rect key="frame" x="311" y="36" width="16" height="2"/>
+                        <rect key="frame" x="289" y="28" width="59" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <state key="normal" title="Button"/>
                         <buttonConfiguration key="configuration" style="plain" image="Icon">
@@ -46,12 +46,12 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="renameDeleteButton" destination="H2p-sc-9uM" id="Bo1-ol-y64"/>
+                <outlet property="Rename_Delete" destination="YGi-hy-sGj" id="rkX-04-eaV"/>
                 <outlet property="videoImageView" destination="v3G-AG-XgG" id="GQZ-i4-Mku"/>
                 <outlet property="videoNameLabel" destination="yHq-VV-o6i" id="xZ9-F4-mlQ"/>
                 <outlet property="videoTimeLabel" destination="pEg-uv-Jpq" id="6xv-nU-2Y5"/>
             </connections>
-            <point key="canvasLocation" x="203.81679389312976" y="12.323943661971832"/>
+            <point key="canvasLocation" x="304" y="-5"/>
         </tableViewCell>
     </objects>
     <resources>

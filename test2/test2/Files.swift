@@ -22,10 +22,12 @@ class Files: UIViewController {
     var filteredArr = [String]()
     var searching: Bool = false
     
-//    var links: [(name: String, date: String, type: String, url: URL)] = []
+
     var links: [(name: String, time: String, type: String, url: URL)] = []
 
     let userDefaults = UserDefaults.standard
+    
+    var indexSelect: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +45,7 @@ class Files: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
+      
         tableView.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
                 UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = .white
@@ -154,8 +157,9 @@ extension Files: UITableViewDataSource {
             
             let videoDuration = getVideoDuration(url: videoURL)
                     cell.setVideoTime(timeInterval: videoDuration)
+            setMoreButton(for: cell)
         }
-
+        cell.tag = indexPath.row
         cell.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         return cell
     }
@@ -170,6 +174,111 @@ extension Files: UITableViewDataSource {
 
             
     }
+
+fileprivate extension Files {
+    func configure() {
+        self.title = "UIMenu Sample"
+    }
+    
+    func setMoreButton(for cell: TableViewCell) {
+        
+        let menu = UIMenu(title: "", children: [actionEdit, actionDelete])
+        cell.Rename_Delete.menu = menu
+        
+    }
+    
+    var actionEdit: UIAction {
+        return UIAction(title: "Edit", image: UIImage(systemName: "pencil")) { [weak self] action in
+            guard let self = self,
+                  let button = action.sender as? UIButton,
+                  let cell = button.superview?.superview as? TableViewCell,
+                  let indexPath = self.tableView.indexPath(for: cell) else { return }
+
+            let alert = UIAlertController(title: "Edit", message: "Edit TableView Row", preferredStyle: .alert)
+
+            alert.addTextField { textField in
+                textField.placeholder = "Enter new name"
+                textField.text = cell.videoNameLabel.text
+            }
+
+            let update = UIAlertAction(title: "Update", style: .default) { [weak self] action in
+                guard let self = self,
+                      let updateName = alert.textFields?.first?.text else { return }
+
+                // Cập nhật tên video trong mảng dữ liệu của bạn
+                let videoName: String
+                if self.searching {
+                    // Nếu đang tìm kiếm, cập nhật vào mảng filteredArr
+                    if indexPath.row < self.filteredArr.count {
+                        videoName = self.filteredArr[indexPath.row]
+                        self.filteredArr[indexPath.row] = updateName
+                    } else {
+                        return
+                    }
+                } else {
+                    // Nếu không tìm kiếm, cập nhật vào mảng links
+                    if indexPath.row < self.links.count {
+                        videoName = self.links[indexPath.row].name
+                        self.links[indexPath.row].name = updateName
+                    } else {
+                        return
+                    }
+                }
+
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                    print("Update btn Tapped")
+                    print("Updated video name:", videoName)
+                    
+                    // Cập nhật tên tệp trong Documents và UserDefaults
+                    let fileName = self.links[indexPath.row].name
+                    let updatedFileName = self.updateFileName(at: fileName, with: updateName)
+                    print("Updated file name in Documents:", updatedFileName)
+                    self.links[indexPath.row].name = updatedFileName
+                    self.saveLinks()
+                }
+            }
+
+            alert.addAction(update)
+
+            // Thêm nút hủy bỏ
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            alert.addAction(cancel)
+
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+
+    func updateFileName(at path: String, with newName: String) -> String {
+        let fileManager = FileManager.default
+        guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return path
+        }
+        
+        let sourceURL = documentsFolderURL.appendingPathComponent(path)
+        let destinationURL = documentsFolderURL.appendingPathComponent(newName)
+        
+        do {
+            try fileManager.moveItem(at: sourceURL, to: destinationURL)
+            return newName
+        } catch {
+            print("Error updating file name:", error)
+            return path
+        }
+    }
+
+
+
+
+    
+    var actionDelete: UIAction {
+        return UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+            // Perform delete action here
+            // ...
+        }
+    }
+}
+
 
 
 // MARK: - UITableViewDelegate
@@ -190,6 +299,17 @@ extension Files: UITableViewDelegate {
 
 
 extension Files: UISearchBarDelegate {
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+            searchBar.showsCancelButton = true
+            return true
+        }
+        func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+            searchBar.resignFirstResponder()
+            searchBar.showsCancelButton = false
+            searching = false
+            searchBar.text = ""
+            tableView.reloadData()
+        }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
             filteredArr = links.filter({$0.name.lowercased().prefix(searchText.count) == searchText.lowercased()})
@@ -200,11 +320,7 @@ extension Files: UISearchBarDelegate {
             tableView.reloadData()
         }
 
-     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-         searching = false
-         searchBar.text = ""
-         tableView.reloadData()
-     }
+
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()

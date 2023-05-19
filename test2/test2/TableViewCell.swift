@@ -20,14 +20,17 @@ class TableViewCell: UITableViewCell {
     
     @IBOutlet weak var videoTimeLabel: UILabel!
     
-    @IBOutlet weak var renameDeleteButton: UIView!
+
+    @IBOutlet weak var Rename_Delete: UIButton!
     
 
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
     }
+
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
