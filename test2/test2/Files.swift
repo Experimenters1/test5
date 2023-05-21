@@ -55,15 +55,34 @@ class Files: UIViewController {
 
     
      
-func saveLinks() {
-    let fileManager = FileManager.default
-    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-        return
+//func saveLinks() {
+//    let fileManager = FileManager.default
+//    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+//        return
+//    }
+//    let fileURLs = try? fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
+//    let fileNames = fileURLs?.map { $0.lastPathComponent }
+//    userDefaults.set(fileNames, forKey: "fileName")
+//}
+    
+    func saveLinks() {
+        let fileManager = FileManager.default
+        guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
+            let fileNames = fileURLs.map { $0.lastPathComponent }
+            
+            // Lưu lại danh sách tên file vào UserDefaults
+            userDefaults.set(fileNames, forKey: "fileName")
+        } catch {
+            print("Error retrieving file names:", error)
+        }
+        
+//        tableView.reloadData()
     }
-    let fileURLs = try? fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
-    let fileNames = fileURLs?.map { $0.lastPathComponent }
-    userDefaults.set(fileNames, forKey: "fileName")
-}
 
 func loadLinks() {
      guard let fileNames = userDefaults.array(forKey: "fileName") as? [String] else {
@@ -226,16 +245,26 @@ fileprivate extension Files {
                 }
 
                 DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    print("Update btn Tapped")
-                    print("Updated video name:", videoName)
-                    
-                    // Cập nhật tên tệp trong Documents và UserDefaults
-                    let fileName = self.links[indexPath.row].name
-                    let updatedFileName = self.updateFileName(at: fileName, with: updateName)
-                    print("Updated file name in Documents:", updatedFileName)
-                    self.links[indexPath.row].name = updatedFileName
-                    self.saveLinks()
+                    let fileManager = FileManager.default
+                    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                        return
+                    }
+
+                    let sourceURL = documentsFolderURL.appendingPathComponent(videoName)
+                    let destinationURL = documentsFolderURL.appendingPathComponent(updateName)
+
+                    do {
+                        try fileManager.moveItem(at: sourceURL, to: destinationURL)
+
+                        self.saveLinks() // Cập nhật dữ liệu trong saveLinks()
+
+                        self.tableView.reloadData()
+                        print("Update btn Tapped")
+                        print("Updated video name:", videoName)
+                        print("Updated file name in Documents:", updateName)
+                    } catch {
+                        print("Error updating file name:", error)
+                    }
                 }
             }
 
@@ -246,24 +275,6 @@ fileprivate extension Files {
             alert.addAction(cancel)
 
             self.present(alert, animated: true, completion: nil)
-        }
-    }
-
-    func updateFileName(at path: String, with newName: String) -> String {
-        let fileManager = FileManager.default
-        guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return path
-        }
-        
-        let sourceURL = documentsFolderURL.appendingPathComponent(path)
-        let destinationURL = documentsFolderURL.appendingPathComponent(newName)
-        
-        do {
-            try fileManager.moveItem(at: sourceURL, to: destinationURL)
-            return newName
-        } catch {
-            print("Error updating file name:", error)
-            return path
         }
     }
 
