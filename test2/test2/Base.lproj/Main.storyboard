@@ -88,7 +88,7 @@
         <!--Album-->
         <scene sceneID="WtX-b9-eY9">
             <objects>
-                <viewController id="hgn-xC-6a2" sceneMemberID="viewController">
+                <viewController id="hgn-xC-6a2" customClass="Album" customModule="test2" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="qFy-VT-0Jx">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -96,35 +96,37 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TM8-yT-33o">
                                 <rect key="frame" x="0.0" y="103" width="393" height="666"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V7i-V1-KQA">
-                                        <rect key="frame" x="128" y="299" width="143" height="60"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HRP-KK-XuY">
+                                        <rect key="frame" x="92" y="39" width="210" height="54"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="album"/>
+                                        <connections>
+                                            <action selector="btn_add_Album:" destination="hgn-xC-6a2" eventType="touchUpInside" id="nJX-zD-vbT"/>
+                                        </connections>
+                                    </button>
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="X8l-mi-hWK">
+                                        <rect key="frame" x="0.0" y="106" width="393" height="599"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    </tableView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemOrangeColor"/>
-                                <constraints>
-                                    <constraint firstItem="V7i-V1-KQA" firstAttribute="top" secondItem="TM8-yT-33o" secondAttribute="top" constant="299" id="9Hg-mr-KTT"/>
-                                    <constraint firstAttribute="trailing" secondItem="V7i-V1-KQA" secondAttribute="trailing" constant="160" id="V7P-ht-RGA"/>
-                                </constraints>
+                                <color key="backgroundColor" systemColor="systemPinkColor"/>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="3HJ-FK-cmE"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="V7i-V1-KQA" firstAttribute="centerX" secondItem="3HJ-FK-cmE" secondAttribute="centerX" id="6Pg-dz-QBM"/>
                             <constraint firstItem="3HJ-FK-cmE" firstAttribute="bottom" secondItem="TM8-yT-33o" secondAttribute="bottom" id="B4K-OB-QGk"/>
-                            <constraint firstItem="V7i-V1-KQA" firstAttribute="top" secondItem="3HJ-FK-cmE" secondAttribute="top" constant="299" id="SRi-cu-gmT"/>
-                            <constraint firstItem="3HJ-FK-cmE" firstAttribute="trailing" secondItem="V7i-V1-KQA" secondAttribute="trailing" constant="160" id="gld-7r-EKX"/>
                             <constraint firstItem="TM8-yT-33o" firstAttribute="top" secondItem="3HJ-FK-cmE" secondAttribute="top" id="h64-8z-18y"/>
                             <constraint firstItem="TM8-yT-33o" firstAttribute="leading" secondItem="3HJ-FK-cmE" secondAttribute="leading" id="hWN-VA-WJc"/>
-                            <constraint firstItem="V7i-V1-KQA" firstAttribute="leading" secondItem="3HJ-FK-cmE" secondAttribute="leading" constant="160" id="lfD-fW-6Ml"/>
-                            <constraint firstItem="3HJ-FK-cmE" firstAttribute="bottom" secondItem="V7i-V1-KQA" secondAttribute="bottom" constant="346" id="meg-rg-pGt"/>
                             <constraint firstItem="3HJ-FK-cmE" firstAttribute="trailing" secondItem="TM8-yT-33o" secondAttribute="trailing" id="ymF-DW-GtZ"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Album" id="2DE-WD-MAu"/>
+                    <connections>
+                        <outlet property="TableView_Album" destination="X8l-mi-hWK" id="byT-I2-mVC"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eaG-TL-Swg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -190,11 +192,11 @@
             </objects>
             <point key="canvasLocation" x="321" y="897"/>
         </scene>
-        <!--Item-->
+        <!--File-->
         <scene sceneID="bcU-Li-SZL">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="veZ-qe-msU" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="jDX-jv-TGg"/>
+                    <tabBarItem key="tabBarItem" title="File" image="multiple 1" landscapeImage="multiple" largeContentSizeImage="multiple" id="jDX-jv-TGg"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="OuR-Bu-cxU">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -209,11 +211,11 @@
             </objects>
             <point key="canvasLocation" x="-1395" y="149"/>
         </scene>
-        <!--Item-->
+        <!--Album-->
         <scene sceneID="UM9-au-ot6">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="j3Z-Se-kR5" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="KRQ-sx-ued"/>
+                    <tabBarItem key="tabBarItem" title="Album" image="closed" id="KRQ-sx-ued"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="eEo-4c-j3x">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -228,11 +230,11 @@
             </objects>
             <point key="canvasLocation" x="-373" y="132"/>
         </scene>
-        <!--Item-->
+        <!--Import-->
         <scene sceneID="mXB-lY-9Ex">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="jxr-pd-Ju4" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="4qS-Ce-oNI"/>
+                    <tabBarItem key="tabBarItem" title="Import" image="swipe left" id="4qS-Ce-oNI"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Lfx-gM-IZv">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -257,6 +259,26 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JR8-ku-qcw">
                                 <rect key="frame" x="0.0" y="103" width="393" height="666"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BPX-j1-iB5">
+                                        <rect key="frame" x="48" y="27" width="296" height="122"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="type"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zaz-kf-k9S">
+                                        <rect key="frame" x="49" y="355" width="296" height="122"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="type (2)"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b7k-zD-Oab">
+                                        <rect key="frame" x="48" y="183" width="296" height="122"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="type (1)"/>
+                                    </button>
+                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBrownColor"/>
                             </view>
                         </subviews>
@@ -275,11 +297,11 @@
             </objects>
             <point key="canvasLocation" x="1185" y="887"/>
         </scene>
-        <!--Item-->
+        <!--Setting-->
         <scene sceneID="s18-EV-r8e">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="GWX-ng-Ghi" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="0QY-XV-lRt"/>
+                    <tabBarItem key="tabBarItem" title="Setting" image="Icon 1" id="0QY-XV-lRt"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="NSh-ON-dKA">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -296,8 +318,17 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Icon 1" width="23" height="22"/>
         <image name="Image1" width="310" height="160"/>
         <image name="Image2" width="310" height="160"/>
+        <image name="album" width="186" height="40"/>
+        <image name="closed" width="24" height="24"/>
+        <image name="multiple" width="24" height="24"/>
+        <image name="multiple 1" width="24" height="24"/>
+        <image name="swipe left" width="24" height="24"/>
+        <image name="type" width="272" height="108"/>
+        <image name="type (1)" width="272" height="108"/>
+        <image name="type (2)" width="272" height="108"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
@@ -307,8 +338,8 @@
         <systemColor name="systemMintColor">
             <color red="0.0" green="0.7803921568627451" blue="0.74509803921568629" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
-        <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemPinkColor">
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

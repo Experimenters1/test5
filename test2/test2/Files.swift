@@ -197,14 +197,14 @@ fileprivate extension Files {
                   let cell = button.superview?.superview as? TableViewCell,
                   let indexPath = self.tableView.indexPath(for: cell) else { return }
 
-            let alert = UIAlertController(title: "Edit", message: "Edit TableView Row", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Set new name for file", message: "", preferredStyle: .alert)
 
             alert.addTextField { textField in
                 textField.placeholder = "Enter new name"
                 textField.text = cell.videoNameLabel.text
             }
 
-            let update = UIAlertAction(title: "Update", style: .default) { [weak self] action in
+            let update = UIAlertAction(title: "Rename", style: .default) { [weak self] action in
                 guard let self = self,
                       let updateName = alert.textFields?.first?.text else { return }
 
@@ -299,15 +299,28 @@ fileprivate extension Files {
 
             let fileURL = documentsFolderURL.appendingPathComponent(videoName)
 
-            do {
-                try fileManager.removeItem(at: fileURL)
+            let alert = UIAlertController(title: "Delete File", message: "Confirm the deletion of the file", preferredStyle: .alert)
 
-                self.saveLinks() // Cập nhật dữ liệu trong saveLinks()
-                self.loadLinks() // Load lại dữ liệu từ Documents
-                self.tableView.reloadData()
-            } catch {
-                print("Error deleting file:", error)
+            let delete = UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
+                guard let self = self else { return }
+
+                do {
+                    try fileManager.removeItem(at: fileURL)
+
+                    self.saveLinks() // Cập nhật dữ liệu trong saveLinks()
+                    self.loadLinks() // Load lại dữ liệu từ Documents
+                    self.tableView.reloadData()
+                } catch {
+                    print("Error deleting file:", error)
+                }
             }
+
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+
+            alert.addAction(delete)
+            alert.addAction(cancel)
+
+            self.present(alert, animated: true, completion: nil)
         }
     }
 
