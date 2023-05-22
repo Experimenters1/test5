@@ -55,56 +55,40 @@ class Files: UIViewController {
 
     
      
-//func saveLinks() {
-//    let fileManager = FileManager.default
-//    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-//        return
-//    }
-//    let fileURLs = try? fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
-//    let fileNames = fileURLs?.map { $0.lastPathComponent }
-//    userDefaults.set(fileNames, forKey: "fileName")
-//}
-    
-    func saveLinks() {
-        let fileManager = FileManager.default
-        guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return
-        }
-        
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
-            let fileNames = fileURLs.map { $0.lastPathComponent }
-            
-            // Lưu lại danh sách tên file vào UserDefaults
-            userDefaults.set(fileNames, forKey: "fileName")
-        } catch {
-            print("Error retrieving file names:", error)
-        }
-        
-//        tableView.reloadData()
-    }
-
-func loadLinks() {
-     guard let fileNames = userDefaults.array(forKey: "fileName") as? [String] else {
-        return
-    }
+func saveLinks() {
     let fileManager = FileManager.default
     guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
         return
     }
-    print("Mac dinh : \(documentsFolderURL)")
-               
-    for fileName in fileNames {
-        let fileURL = documentsFolderURL.appendingPathComponent(fileName)
-        let attributes = try? fileManager.attributesOfItem(atPath: fileURL.path)
-        let creationDate = attributes?[.creationDate] as? Date ?? Date()
-        let type = fileURL.pathExtension.lowercased()
-//        links.append((name: fileName, date: DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium), type: type, url: fileURL))
-        let time = DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium)
-        links.append((name: fileName, time: time, type: type, url: fileURL))
-
-    }
+    let fileURLs = try? fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
+    let fileNames = fileURLs?.map { $0.lastPathComponent }
+    userDefaults.set(fileNames, forKey: "fileName")
 }
+    
+    
+
+    func loadLinks() {
+        links.removeAll() // Xóa dữ liệu hiện có để làm mới
+
+        guard let fileNames = userDefaults.array(forKey: "fileName") as? [String] else {
+            return
+        }
+
+        let fileManager = FileManager.default
+        guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        for fileName in fileNames {
+            let fileURL = documentsFolderURL.appendingPathComponent(fileName)
+            let attributes = try? fileManager.attributesOfItem(atPath: fileURL.path)
+            let creationDate = attributes?[.creationDate] as? Date ?? Date()
+            let type = fileURL.pathExtension.lowercased()
+
+            let time = DateFormatter.localizedString(from: creationDate, dateStyle: .medium, timeStyle: .medium)
+            links.append((name: fileName, time: time, type: type, url: fileURL))
+        }
+    }
 
             
            
@@ -258,6 +242,7 @@ fileprivate extension Files {
 
                         self.saveLinks() // Cập nhật dữ liệu trong saveLinks()
 
+                        self.loadLinks() // Load lại dữ liệu từ Documents
                         self.tableView.reloadData()
                         print("Update btn Tapped")
                         print("Updated video name:", videoName)
@@ -280,14 +265,53 @@ fileprivate extension Files {
 
 
 
-
     
     var actionDelete: UIAction {
-        return UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+        return UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] deleteAction in
             // Perform delete action here
-            // ...
+            guard let self = self,
+                  let button = deleteAction.sender as? UIButton,
+                  let cell = button.superview?.superview as? TableViewCell,
+                  let indexPath = self.tableView.indexPath(for: cell) else { return }
+
+            let fileManager = FileManager.default
+            let videoName: String
+
+            if self.searching {
+                if indexPath.row < self.filteredArr.count {
+                    videoName = self.filteredArr[indexPath.row]
+                    self.filteredArr.remove(at: indexPath.row)
+                } else {
+                    return
+                }
+            } else {
+                if indexPath.row < self.links.count {
+                    videoName = self.links[indexPath.row].name
+                    self.links.remove(at: indexPath.row)
+                } else {
+                    return
+                }
+            }
+
+            guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return
+            }
+
+            let fileURL = documentsFolderURL.appendingPathComponent(videoName)
+
+            do {
+                try fileManager.removeItem(at: fileURL)
+
+                self.saveLinks() // Cập nhật dữ liệu trong saveLinks()
+                self.loadLinks() // Load lại dữ liệu từ Documents
+                self.tableView.reloadData()
+            } catch {
+                print("Error deleting file:", error)
+            }
         }
     }
+
+
 }
 
 
