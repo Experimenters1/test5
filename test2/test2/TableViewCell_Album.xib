@@ -4,7 +4,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -36,30 +35,25 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t1e-QF-Dlk">
-                        <rect key="frame" x="283" y="23" width="75" height="35"/>
+                        <rect key="frame" x="300" y="34" width="42" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" systemColor="systemIndigoColor"/>
                         <state key="normal" title="Button"/>
-                        <buttonConfiguration key="configuration" style="plain" title="Button">
-                            <color key="baseForegroundColor" systemColor="systemGreenColor"/>
-                        </buttonConfiguration>
+                        <buttonConfiguration key="configuration" style="plain" image="Icon"/>
                     </button>
                 </subviews>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="NameLabel" destination="nG8-sy-WVf" id="G0L-nP-4TG"/>
+                <outlet property="Rename_Delete" destination="t1e-QF-Dlk" id="aby-C4-ija"/>
                 <outlet property="imge" destination="CEf-QW-wFW" id="5sg-PP-nJR"/>
+                <outlet property="quantity_Label" destination="2wS-xX-46R" id="Trb-ge-SfP"/>
             </connections>
             <point key="canvasLocation" x="131" y="-11"/>
         </tableViewCell>
     </objects>
     <resources>
+        <image name="Icon" width="18" height="4"/>
         <image name="album frame" width="80" height="80"/>
-        <systemColor name="systemGreenColor">
-            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemIndigoColor">
-            <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
     </resources>
 </document>

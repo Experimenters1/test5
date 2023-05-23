@@ -11,6 +11,12 @@ class TableViewCell_Album: UITableViewCell {
 
     @IBOutlet weak var imge: UIImageView!
     
+    @IBOutlet weak var NameLabel: UILabel!
+    
+    @IBOutlet weak var quantity_Label: UILabel!
+    
+    @IBOutlet weak var Rename_Delete: UIButton!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

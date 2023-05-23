@@ -60,6 +60,7 @@ func saveLinks() {
     guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
         return
     }
+     print("FVHBVFJVNJNFVF\(documentsFolderURL)")
     let fileURLs = try? fileManager.contentsOfDirectory(at: documentsFolderURL, includingPropertiesForKeys: nil)
     let fileNames = fileURLs?.map { $0.lastPathComponent }
     userDefaults.set(fileNames, forKey: "fileName")
@@ -156,7 +157,9 @@ extension Files: UITableViewDataSource {
             
             
             let videoURL = links[indexPath.row].url
-                cell.setVideoImage(fromURL: videoURL)
+            if let thumbnail = generateThumbnail(path: videoURL) {
+                cell.videoImageView.image = thumbnail
+            }
             
             let videoDuration = getVideoDuration(url: videoURL)
                     cell.setVideoTime(timeInterval: videoDuration)
@@ -173,9 +176,19 @@ extension Files: UITableViewDataSource {
         let durationSeconds = CMTimeGetSeconds(duration)
         return durationSeconds
     }
-
-
-            
+    
+    func generateThumbnail(path: URL) -> UIImage? {
+               let asset = AVAsset(url: path)
+               let imageGenerator = AVAssetImageGenerator(asset: asset)
+               do {
+                   let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
+                   let thumbnail = UIImage(cgImage: cgImage)
+                   return thumbnail
+               } catch {
+                   print(error.localizedDescription)
+                   return nil
+               }
+           }
     }
 
 fileprivate extension Files {
@@ -351,6 +364,7 @@ extension Files: UISearchBarDelegate {
             searchBar.showsCancelButton = true
             return true
         }
+    
         func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
             searchBar.resignFirstResponder()
             searchBar.showsCancelButton = false

@@ -45,7 +45,7 @@ extension Import: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let sourceURL = urls.first else { return }
 
-        let navVC = self.navigationController?.tabBarController?.viewControllers?[0] as! UINavigationController
+        let navVC = self.navigationController?.tabBarController?.viewControllers?[1] as! UINavigationController
 
         guard let filesVC = navVC.viewControllers[0] as? Files else {
             return
@@ -100,7 +100,7 @@ extension Import: UIImagePickerControllerDelegate, UINavigationControllerDelegat
             return
         }
         
-        let navVC = self.navigationController?.tabBarController?.viewControllers?[0] as! UINavigationController
+        let navVC = self.navigationController?.tabBarController?.viewControllers?[1] as! UINavigationController
 
         guard let filesVC = navVC.viewControllers[0] as? Files else {
             return
