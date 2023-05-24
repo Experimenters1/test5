@@ -200,6 +200,7 @@ fileprivate extension Files {
         
         let menu = UIMenu(title: "", children: [actionEdit, actionDelete])
         cell.Rename_Delete.menu = menu
+        cell.Rename_Delete.showsMenuAsPrimaryAction = true  //Nhan vao thi hien ra Menu
         
     }
     

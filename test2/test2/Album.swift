@@ -76,10 +76,11 @@ class Album: UIViewController {
     }
 }
 
-extension Album: UITableViewDataSource {
+extension Album: UITableViewDataSource,UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return albumsDictionary.count
     }
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell_Album", for: indexPath) as? TableViewCell_Album else {
@@ -98,6 +99,6 @@ extension Album: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        return 96
     }
 }
