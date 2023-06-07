@@ -44,6 +44,7 @@
                         </buttonConfiguration>
                     </button>
                 </subviews>
+                <color key="backgroundColor" red="0.10196078431372549" green="0.094117647058823528" blue="0.090196078431372548" alpha="1" colorSpace="calibratedRGB"/>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>

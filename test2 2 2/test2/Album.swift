@@ -6,6 +6,10 @@
 //
 
 import UIKit
+import UIKit
+import AVFoundation
+import AVKit
+import MobileCoreServices
 
 var fileTab2: Album?
 
@@ -14,6 +18,8 @@ class Album: UIViewController {
     let userDefaults = UserDefaults.standard
 
     var albumsDictionary: [String: [String]] = [:]
+    
+    var links: [(name: String, time: String, type: String, url: URL)] = []
     
     @IBOutlet weak var TableView_Album: UITableView!
     
@@ -29,22 +35,12 @@ class Album: UIViewController {
         if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
             albumsDictionary = savedAlbums
         }
-        TableView_Album.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
+//        TableView_Album.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         TableView_Album.reloadData()
-        let newTitleColor = UIColor.white
-
-        // Lấy navigation bar hiện tại của view controller
-        if let navigationBar = self.navigationController?.navigationBar {
-            // Tạo một bản sao của thuộc tính titleTextAttributes hiện tại
-            var titleTextAttributes = navigationBar.titleTextAttributes ?? [:]
-            // Đặt màu chữ mới vào thuộc tính titleTextAttributes
-            titleTextAttributes[NSAttributedString.Key.foregroundColor] = newTitleColor
-            
-            // Thiết lập thuộc tính titleTextAttributes mới
-            navigationBar.titleTextAttributes = titleTextAttributes
-        }
-
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(albumsDictionaryDidChange), name: UserDefaults.didChangeNotification, object: nil)
     }
+    
     
     @IBAction func btn_add_Album(_ sender: Any) {
         let alert = UIAlertController(title: "Create Album", message: "Enter album name", preferredStyle: .alert)
@@ -92,7 +88,20 @@ class Album: UIViewController {
             print("Album not found.")
         }
     }
+    
+    deinit {
+            NotificationCenter.default.removeObserver(self)
+        }
+        
+    @objc func albumsDictionaryDidChange() {
+        if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
+            albumsDictionary = savedAlbums
+            TableView_Album.reloadData()
+        }
+    }
 }
+
+
 
 extension Album: UITableViewDataSource,UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -110,16 +119,75 @@ extension Album: UITableViewDataSource,UITableViewDelegate {
         if indexPath.row < albumNames.count {
             let albumName = albumNames[indexPath.row]
             cell.NameLabel.text = albumName
+            
+            let fileManager = FileManager.default
+                    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                        return UITableViewCell()
+                    }
+                    
+                    if let firstAlbumName = albumsDictionary.keys.first, let firstSongName = albumsDictionary[firstAlbumName]?.first {
+                        let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
+                        
+                        if let thumbnail = generateThumbnail(path: videoURL) {
+                            cell.imge.image = thumbnail
+                        } else {
+                            cell.imge.image = UIImage(named: "album thumbnail")
+                        }
+                    }
+
+
         }
         
+        
+
+
+       
+       
         cell.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         cell.tag = indexPath.row // Gán giá trị indexPath.row cho thuộc tính tag của cell
         
         // Gọi hàm setMoreButton để gán hành động cho nút Rename_Delete
         setMoreButton(for: cell, at: indexPath)
+        updateSongCount(forCell: cell, atIndexPath: indexPath)
+        
         
         return cell
     }
+    
+    func generateThumbnail(path: URL) -> UIImage? {
+           let asset = AVAsset(url: path)
+           let imageGenerator = AVAssetImageGenerator(asset: asset)
+           do {
+               let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
+               let thumbnail = UIImage(cgImage: cgImage)
+               return thumbnail
+           } catch {
+               print(error.localizedDescription)
+               return nil
+           }
+       }
+
+
+
+    
+    func updateSongCount(forCell cell: TableViewCell_Album, atIndexPath indexPath: IndexPath) {
+            let albumNames = Array(albumsDictionary.keys)
+            
+            if indexPath.row < albumNames.count {
+                let albumName = albumNames[indexPath.row]
+                cell.NameLabel.text = albumName
+                
+                if let albumSongs = albumsDictionary[albumName] {
+                    let songCount = albumSongs.count
+                    cell.quantity_Label.text = "\(songCount) \(songCount != 1 ? " " : "")"
+                } else {
+                    cell.quantity_Label.text = "0 songs"
+                }
+            }
+        }
+    
+    
+
 
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

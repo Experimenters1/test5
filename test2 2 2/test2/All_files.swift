@@ -29,8 +29,8 @@ class All_files: UIViewController {
     
 
     var isCheckedArray: [Bool] = []
-
-
+    var selectedItems: [String] = []
+    var current_albums = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,14 +44,13 @@ class All_files: UIViewController {
         tableView.dataSource = self
         searchBar.delegate = self
       
-        tableView.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
+//        tableView.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
                 UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = .white
         
         let filesVC1 = Files()
         fileTab3 = filesVC1
         loadLinks()
-        
     
     }
     
@@ -91,13 +90,28 @@ class All_files: UIViewController {
         let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let All_filesViewController = storyboard.instantiateViewController(withIdentifier: "All_files") as! All_files
         All_filesViewController.title = albumName
+        All_filesViewController.current_albums = albumName
         return All_filesViewController
     }
     
+
     @objc func rightBarButtonItemTapped() {
-        let filesVC = fileTab2!
+        let filesVC4 = fileTab4!
+
+
+        // Gọi hàm addSong với từng phần tử trong selectedItems
+        for songName in selectedItems {
+            filesVC4.addSong_Payment_Adjustment(songName, toAlbum: current_albums)
+        }
+
         print("Right bar button item tapped")
+        
+
+        
+        // Trở về màn hình trước
+        navigationController?.popViewController(animated: true)
     }
+
 
 }
 
@@ -127,7 +141,7 @@ extension All_files: UITableViewDataSource ,UITableViewDelegate {
 
         let isChecked = isCheckedArray[indexPath.row]
             cell.checkbox.isSelected = isChecked
-            cell.checkbox.setImage(UIImage(named: isChecked ? "checkbox" : "default_checkbox"), for: .normal)
+            cell.checkbox.setImage(UIImage(named: isChecked ? "checkbox" : "checkbox 1"), for: .normal)
 
             var indexPathForClosure = indexPath // Tạo biến indexPath cục bộ
 
@@ -135,7 +149,7 @@ extension All_files: UITableViewDataSource ,UITableViewDelegate {
                 guard let self = self else { return }
                 self.toggleCheckbox(at: indexPathForClosure.row, isChecked: isChecked) // Sử dụng biến indexPath cục bộ
                 cell.checkbox.isSelected = isChecked
-                cell.checkbox.setImage(UIImage(named: isChecked ? "checkbox" : "default_checkbox"), for: .normal)
+                cell.checkbox.setImage(UIImage(named: isChecked ? "checkbox" : "checkbox 1"), for: .normal)
             }
 
 
@@ -150,27 +164,30 @@ extension All_files: UITableViewDataSource ,UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? TableViewCell_All_files {
-            if let checkbox = cell.checkbox {
-                checkbox.isSelected = !checkbox.isSelected
-                checkbox.setImage(UIImage(named: checkbox.isSelected ? "checkbox" : "checkbox 1"), for: .normal)
-
-                toggleCheckbox(at: indexPath.row, isChecked: checkbox.isSelected)
+            let isChecked = !cell.checkbox.isSelected
+            cell.checkbox.isSelected = isChecked
+            cell.checkbox.setImage(UIImage(named: isChecked ? "checkbox" : "checkbox 1"), for: .normal)
+            
+            isCheckedArray[indexPath.row] = isChecked
+            
+            if isChecked {
+                let name = links[indexPath.row].name
+                selectedItems.append(name)
+            } else {
+                let name = links[indexPath.row].name
+                if let index = selectedItems.firstIndex(of: name) {
+                    selectedItems.remove(at: index)
+                }
             }
-        }
-
-        tableView.deselectRow(at: indexPath, animated: true)
-
-        // In ra thông tin của hàng được chọn
-        if searching {
-            let selectedData = filteredArr[indexPath.row]
-            print("Selected data: \(selectedData)")
-        } else {
-            let selectedData = links[indexPath.row]
-            print("Selected data: \(selectedData)")
+            
+            tableView.deselectRow(at: indexPath, animated: true)
+            // In ra mảng selectedItems
+                    print(selectedItems)
         }
     }
 
 
+        
 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
