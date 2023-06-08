@@ -42,15 +42,12 @@ class Payment_Adjustment: UIViewController {
                    filesVC2 = Album() // Gán giá trị cho biến filesVC2 trong phương thức viewDidLoad()
                fileTab2 = filesVC2
         // Load albums data from UserDefaults
-          if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
-              albumsDictionary = savedAlbums
-          }
-        
+        loadLinks()
         tableViewLs.delegate = self // Set the delegate of the tableViewLs
         tableViewLs.dataSource = self // Set the data source of the tableViewLs
         tableViewLs.register(UINib(nibName: "Payment_Adjustment_TableViewCell", bundle: nil), forCellReuseIdentifier: "cell_Payment")
         tableViewLs.reloadData()
-        loadLinks()
+        
 //        tableViewLs.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         let newTitleColor = UIColor.white
 
@@ -122,12 +119,6 @@ class Payment_Adjustment: UIViewController {
             albumsDictionary = savedAlbums
             tableViewLs.reloadData()
         }
-    }
-
-    func passDataToAlbum(songName: String, albumName: String) {
-        filesVC2?.albumsDictionary = self.albumsDictionary
-        userDefaults.set(albumsDictionary, forKey: "albumsDictionary")
-        filesVC2?.addSong(songName, toAlbum: albumName) // Gọi phương thức addSong() của Album
     }
 
 

@@ -38,8 +38,18 @@ class Album: UIViewController {
 //        TableView_Album.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         TableView_Album.reloadData()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(albumsDictionaryDidChange), name: UserDefaults.didChangeNotification, object: nil)
+        //NotificationCenter.default.addObserver(self, selector: #selector(albumsDictionaryDidChange), name: UserDefaults.didChangeNotification, object: nil)
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
+            albumsDictionary = savedAlbums
+        }
+     
+        TableView_Album.reloadData()
+    }
+
     
     
     @IBAction func btn_add_Album(_ sender: Any) {
@@ -103,11 +113,10 @@ class Album: UIViewController {
 
 
 
-extension Album: UITableViewDataSource,UITableViewDelegate {
+extension Album: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return albumsDictionary.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell_Album", for: indexPath) as? TableViewCell_Album else {
@@ -120,72 +129,69 @@ extension Album: UITableViewDataSource,UITableViewDelegate {
             let albumName = albumNames[indexPath.row]
             cell.NameLabel.text = albumName
             
-            let fileManager = FileManager.default
-                    guard let documentsFolderURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                        return UITableViewCell()
-                    }
-                    
-                    if let firstAlbumName = albumsDictionary.keys.first, let firstSongName = albumsDictionary[firstAlbumName]?.first {
-                        let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
-                        
-                        if let thumbnail = generateThumbnail(path: videoURL) {
-                            cell.imge.image = thumbnail
-                        } else {
-                            cell.imge.image = UIImage(named: "album thumbnail")
-                        }
-                    }
-
-
+            // Update albumsDictionary and thumbnail image for the cell
+            updateAlbumsDictionary(for: cell, albumName: albumName)
+            updateSongCount(forCell: cell, atIndexPath: indexPath)
         }
         
-        
-
-
-       
-       
         cell.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
         cell.tag = indexPath.row // Gán giá trị indexPath.row cho thuộc tính tag của cell
         
         // Gọi hàm setMoreButton để gán hành động cho nút Rename_Delete
         setMoreButton(for: cell, at: indexPath)
-        updateSongCount(forCell: cell, atIndexPath: indexPath)
-        
         
         return cell
     }
     
     func generateThumbnail(path: URL) -> UIImage? {
-           let asset = AVAsset(url: path)
-           let imageGenerator = AVAssetImageGenerator(asset: asset)
-           do {
-               let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
-               let thumbnail = UIImage(cgImage: cgImage)
-               return thumbnail
-           } catch {
-               print(error.localizedDescription)
-               return nil
-           }
-       }
-
-
+        let asset = AVAsset(url: path)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
+            let thumbnail = UIImage(cgImage: cgImage)
+            return thumbnail
+        } catch {
+            print(error.localizedDescription)
+            return nil
+        }
+    }
+    
+    func updateAlbumsDictionary(for cell: TableViewCell_Album, albumName: String) {
+        // Retrieve the existing albumsDictionary from UserDefaults
+        guard var albumsDictionary = UserDefaults.standard.dictionary(forKey: "albumsDictionary") as? [String: [String]],
+            let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+            let firstSongName = albumsDictionary[albumName]?.first else {
+                return
+        }
+        
+        
+        // Get videoURL for the song in the specified album
+        let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
+        print("huy1 \(firstSongName)")
+        print("huy2 \(firstSongName)")
+        if let thumbnail = generateThumbnail(path: videoURL) {
+            cell.imge.image = thumbnail
+        } else {
+            cell.imge.image = UIImage(named: "album thumbnail")
+        }
+    }
 
     
     func updateSongCount(forCell cell: TableViewCell_Album, atIndexPath indexPath: IndexPath) {
-            let albumNames = Array(albumsDictionary.keys)
+        let albumNames = Array(albumsDictionary.keys)
+        
+        if indexPath.row < albumNames.count {
+            let albumName = albumNames[indexPath.row]
+            cell.NameLabel.text = albumName
             
-            if indexPath.row < albumNames.count {
-                let albumName = albumNames[indexPath.row]
-                cell.NameLabel.text = albumName
-                
-                if let albumSongs = albumsDictionary[albumName] {
-                    let songCount = albumSongs.count
-                    cell.quantity_Label.text = "\(songCount) \(songCount != 1 ? " " : "")"
-                } else {
-                    cell.quantity_Label.text = "0 songs"
-                }
+            if let albumSongs = albumsDictionary[albumName] {
+                let songCount = albumSongs.count
+                cell.quantity_Label.text = "\(songCount) \(songCount != 1 ? " " : "")"
+            } else {
+                cell.quantity_Label.text = "0 songs"
             }
         }
-    
+    }
     
 
 
