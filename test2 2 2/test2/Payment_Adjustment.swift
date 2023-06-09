@@ -10,6 +10,8 @@ import UIKit
 import AVFoundation
 import AVKit
 import MobileCoreServices
+import SDWebImageSwiftUI
+import SwiftUI
 
 var fileTab4: Payment_Adjustment?
 
@@ -186,6 +188,7 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
             let videoURL = links[indexPath.row].url
             if let thumbnail = generateThumbnail(path: videoURL) {
                 cell.videoImageView.image = thumbnail
+                
             }
             
             let videoDuration = getVideoDuration(url: videoURL)

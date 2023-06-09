@@ -10,6 +10,9 @@ import UIKit
 import AVFoundation
 import AVKit
 import MobileCoreServices
+import SDWebImageSwiftUI
+import SwiftUI
+
 
 var fileTab2: Album?
 
@@ -143,18 +146,25 @@ extension Album: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-    func generateThumbnail(path: URL) -> UIImage? {
-        let asset = AVAsset(url: path)
+    func cropImage(fromURL url: URL, completion: @escaping (UIImage?) -> Void) {
+        let asset = AVAsset(url: url)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
         do {
             let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
-            let thumbnail = UIImage(cgImage: cgImage)
-            return thumbnail
+            let image = UIImage(cgImage: cgImage)
+            
+            // Thực hiện việc cắt ảnh ở đây (ví dụ: resize, crop, ...)
+            // Ví dụ: Cắt ảnh thành kích thước 200x200
+            let croppedImage = image.sd_resizedImage(with: CGSize(width: 200, height: 200), scaleMode: .aspectFill)
+            
+            completion(croppedImage)
         } catch {
             print(error.localizedDescription)
-            return nil
+            completion(nil)
         }
     }
+    
     
     func updateAlbumsDictionary(for cell: TableViewCell_Album, albumName: String) {
         // Retrieve the existing albumsDictionary from UserDefaults
@@ -164,18 +174,30 @@ extension Album: UITableViewDataSource, UITableViewDelegate {
                 return
         }
         
-        
         // Get videoURL for the song in the specified album
         let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
         print("huy1 \(firstSongName)")
         print("huy2 \(firstSongName)")
-        if let thumbnail = generateThumbnail(path: videoURL) {
-            cell.imge.image = thumbnail
-        } else {
-            cell.imge.image = UIImage(named: "album thumbnail")
+        cropImage(fromURL: videoURL) { croppedImage in
+            DispatchQueue.main.async {
+                if let image = croppedImage {
+                    // Lưu ảnh vào bộ nhớ cache của SDWebImageSwiftUI
+                    let cacheKey = "album_\(albumName)"
+                    SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
+                        // Hiển thị ảnh từ bộ nhớ cache bằng SDWebImageSwiftUI
+                        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+                            cell.imge.image = cachedImage
+                        } else {
+                            cell.imge.image = UIImage(named: "album thumbnail")
+                        }
+                    }
+                } else {
+                    cell.imge.image = UIImage(named: "album thumbnail")
+                }
+            }
         }
     }
-
+    
     
     func updateSongCount(forCell cell: TableViewCell_Album, atIndexPath indexPath: IndexPath) {
         let albumNames = Array(albumsDictionary.keys)
