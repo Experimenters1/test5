@@ -38,7 +38,7 @@ class Album: UIViewController {
         if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
             albumsDictionary = savedAlbums
         }
-//        TableView_Album.backgroundColor = UIColor(red: 0.525, green: 0.525, blue: 0.525, alpha: 1)
+
         TableView_Album.reloadData()
         
         //NotificationCenter.default.addObserver(self, selector: #selector(albumsDictionaryDidChange), name: UserDefaults.didChangeNotification, object: nil)
@@ -49,7 +49,7 @@ class Album: UIViewController {
         if let savedAlbums = userDefaults.dictionary(forKey: "albumsDictionary") as? [String: [String]] {
             albumsDictionary = savedAlbums
         }
-     
+   
         TableView_Album.reloadData()
     }
 
@@ -167,37 +167,39 @@ extension Album: UITableViewDataSource, UITableViewDelegate {
     
     
     func updateAlbumsDictionary(for cell: TableViewCell_Album, albumName: String) {
-        guard let albumsDictionary = UserDefaults.standard.dictionary(forKey: "albumsDictionary") as? [String: [String]],
-              let firstSongName = albumsDictionary[albumName]?.first,
-              let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return
-        }
-        
-        let cacheKey = "album_\(albumName)_\(firstSongName)"
-        
-        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
-            cell.imge.image = cachedImage
-        } else {
-            let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
+        if let albumsDictionary = UserDefaults.standard.dictionary(forKey: "albumsDictionary") as? [String: [String]],
+            let albumSongs = albumsDictionary[albumName], !albumSongs.isEmpty,
+            let firstSongName = albumSongs.first,
+            let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             
-            cropImage(fromURL: videoURL) { croppedImage in
-                DispatchQueue.main.async {
-                    if let image = croppedImage {
-                        SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
-                            if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
-                                cell.imge.image = cachedImage
-                            } else {
-                                cell.imge.image = UIImage(named: "album thumbnail")
+            let cacheKey = "album_\(albumName)_\(firstSongName)"
+            
+            if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+                cell.imge.image = cachedImage
+            } else {
+                let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
+                
+                cropImage(fromURL: videoURL) { croppedImage in
+                    DispatchQueue.main.async {
+                        if let image = croppedImage {
+                            SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
+                                if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+                                    cell.imge.image = cachedImage
+                                } else {
+                                    cell.imge.image = UIImage(named: "album thumbnail")
+                                }
                             }
+                        } else {
+                            cell.imge.image = UIImage(named: "album thumbnail")
                         }
-                    } else {
-                        cell.imge.image = UIImage(named: "album thumbnail")
-                    
                     }
                 }
             }
+        } else {
+            cell.imge.image = UIImage(named: "album thumbnail")
         }
     }
+
 
     
     

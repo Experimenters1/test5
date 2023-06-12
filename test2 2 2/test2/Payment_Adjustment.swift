@@ -31,6 +31,7 @@ class Payment_Adjustment: UIViewController {
     var filteredArr = [String]()
     var searching: Bool = false
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         fileTab4 = self
@@ -218,9 +219,23 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
             links.remove(at: indexPath.row)
         }
         
+//        // Remove the cached image
+//        if let cacheKey = cell.Delete {
+//            SDImageCache.shared.removeImage(forKey: cacheKey, withCompletion: nil)
+//        }
+
+
+        
         // Reload the table view
         tableViewLs.reloadData()
     }
+    
+//    func deleteCachedImage(forKey cacheKey: String) {
+//        SDImageCache.shared.removeImage(forKey: cacheKey, withCompletion: {
+//            print("Cached image removed for key: \(cacheKey)")
+//        })
+//    }
+
 
 
     
@@ -260,7 +275,7 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
 
     func updateCellImage(for cell: Payment_Adjustment_TableViewCell, indexPath: IndexPath, links: [(name: String, time: String, type: String, url: URL)]) {
         let videoURL = links[indexPath.row].url
-        //check cache
+        // Check cache
         let cacheKey = videoURL.absoluteString
         if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
             cell.videoImageView.image = cachedImage
@@ -269,10 +284,13 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
                 DispatchQueue.main.async {
                     if let image = thumbnail {
                         // Store image in cache with a unique key (e.g., based on URL)
-                        
                         SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
                             // Retrieve the image from cache using the same key
-                            
+                            if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+                                DispatchQueue.main.async {
+                                    cell.videoImageView.image = cachedImage
+                                }
+                            }
                         }
                     } else {
                         cell.videoImageView.image = UIImage(named: "song") // Placeholder image if thumbnail generation fails
@@ -281,6 +299,7 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
             }
         }
     }
+
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {   // Hàm được gọi khi người dùng chọn một cell trong UITableView
         let url = links[indexPath.row].url
