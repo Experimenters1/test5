@@ -185,12 +185,9 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
         } else {
             cell.setVideoName(name: links[indexPath.row].name)
             
-            let videoURL = links[indexPath.row].url
-            if let thumbnail = generateThumbnail(path: videoURL) {
-                cell.videoImageView.image = thumbnail
-                
-            }
+            updateCellImage(for: cell, indexPath: indexPath, links: links)
             
+            let videoURL = links[indexPath.row].url
             let videoDuration = getVideoDuration(url: videoURL)
             cell.setVideoTime(timeInterval: videoDuration)
             
@@ -246,19 +243,44 @@ extension Payment_Adjustment: UITableViewDataSource, UITableViewDelegate {
         return durationSeconds
     }
     
-    func generateThumbnail(path: URL) -> UIImage? {
+    // Function to generate thumbnail image from URL
+    func generateThumbnail(path: URL, completion: @escaping (UIImage?) -> Void) {
         let asset = AVAsset(url: path)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
         do {
             let cgImage = try imageGenerator.copyCGImage(at: CMTime(seconds: 1, preferredTimescale: 1), actualTime: nil)
             let thumbnail = UIImage(cgImage: cgImage)
-            return thumbnail
+            completion(thumbnail)
         } catch {
             print(error.localizedDescription)
-            return nil
+            completion(nil)
         }
     }
-    
+
+    func updateCellImage(for cell: Payment_Adjustment_TableViewCell, indexPath: IndexPath, links: [(name: String, time: String, type: String, url: URL)]) {
+        let videoURL = links[indexPath.row].url
+        //check cache
+        let cacheKey = videoURL.absoluteString
+        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+            cell.videoImageView.image = cachedImage
+        } else {
+            generateThumbnail(path: videoURL) { thumbnail in
+                DispatchQueue.main.async {
+                    if let image = thumbnail {
+                        // Store image in cache with a unique key (e.g., based on URL)
+                        
+                        SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
+                            // Retrieve the image from cache using the same key
+                            
+                        }
+                    } else {
+                        cell.videoImageView.image = UIImage(named: "song") // Placeholder image if thumbnail generation fails
+                    }
+                }
+            }
+        }
+    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {   // Hàm được gọi khi người dùng chọn một cell trong UITableView
         let url = links[indexPath.row].url

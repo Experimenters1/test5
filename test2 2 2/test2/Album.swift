@@ -167,36 +167,38 @@ extension Album: UITableViewDataSource, UITableViewDelegate {
     
     
     func updateAlbumsDictionary(for cell: TableViewCell_Album, albumName: String) {
-        // Retrieve the existing albumsDictionary from UserDefaults
-        guard var albumsDictionary = UserDefaults.standard.dictionary(forKey: "albumsDictionary") as? [String: [String]],
-            let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
-            let firstSongName = albumsDictionary[albumName]?.first else {
-                return
+        guard let albumsDictionary = UserDefaults.standard.dictionary(forKey: "albumsDictionary") as? [String: [String]],
+              let firstSongName = albumsDictionary[albumName]?.first,
+              let documentsFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
         }
         
-        // Get videoURL for the song in the specified album
-        let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
-        print("huy1 \(firstSongName)")
-        print("huy2 \(firstSongName)")
-        cropImage(fromURL: videoURL) { croppedImage in
-            DispatchQueue.main.async {
-                if let image = croppedImage {
-                    // Lưu ảnh vào bộ nhớ cache của SDWebImageSwiftUI
-                    let cacheKey = "album_\(albumName)"
-                    SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
-                        // Hiển thị ảnh từ bộ nhớ cache bằng SDWebImageSwiftUI
-                        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
-                            cell.imge.image = cachedImage
-                        } else {
-                            cell.imge.image = UIImage(named: "album thumbnail")
+        let cacheKey = "album_\(albumName)_\(firstSongName)"
+        
+        if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+            cell.imge.image = cachedImage
+        } else {
+            let videoURL = documentsFolderURL.appendingPathComponent(firstSongName)
+            
+            cropImage(fromURL: videoURL) { croppedImage in
+                DispatchQueue.main.async {
+                    if let image = croppedImage {
+                        SDImageCache.shared.store(image, forKey: cacheKey, toDisk: true) {
+                            if let cachedImage = SDImageCache.shared.imageFromCache(forKey: cacheKey) {
+                                cell.imge.image = cachedImage
+                            } else {
+                                cell.imge.image = UIImage(named: "album thumbnail")
+                            }
                         }
+                    } else {
+                        cell.imge.image = UIImage(named: "album thumbnail")
+                    
                     }
-                } else {
-                    cell.imge.image = UIImage(named: "album thumbnail")
                 }
             }
         }
     }
+
     
     
     func updateSongCount(forCell cell: TableViewCell_Album, atIndexPath indexPath: IndexPath) {
